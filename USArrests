@@ -1,0 +1,47 @@
+
+
+USArrests = read.csv("USArrests.csv")
+head(USArrests)
+
+
+rownames(USArrests) = USArrests$X
+USArrests$X = NULL
+head(USArrests)
+
+sum(is.na(USArrests))
+summary (USArrests)
+
+USArrests$Murder[is.na(USArrests$Murder)] <-median(USArrests$Murder,na.rm=T)
+USArrests$Assault[is.na(USArrests$Assault)] <-median(USArrests$Assault,na.rm=T)
+USArrests$UrbanPop[is.na(USArrests$UrbanPop)] <-median(USArrests$UrbanPop,na.rm=T)
+USArrests$Rape[is.na(USArrests$Rape)] <-median(USArrests$Rape,na.rm=T)
+
+
+summary(USArrests)
+
+pca = prcomp(USArrests, scale = TRUE)
+print(pca)
+
+biplot(pca,cex=0.6, col=c(1,4))
+
+pca.hclust <- hclust(dist(pca$x[, 1:3]), method = "complete")
+plot(pca.hclust)
+rect.hclust(pca.hclust, k = 2, border = 2:5)
+
+library(caret)
+set.seed(50)
+indtrain = createDataPartition(y = USArrests$Murder , p= 0.8, list = FALSE)
+train = USArrests[indtrain,]
+test = USArrests[-indtrain,]
+
+reg_mult = lm(Murder ~ ., data = train)
+summary(reg_mult)
+
+ggplot(, aes(USArrests$Murder3, reg_mult$fitted.values)) + geom_point() + geom_abline(intercept=0,slope=1, col='green')
+
+predict(reg_mult, test)
+
+ec_type = summary(reg_mult)$sigma
+normed_res = reg_mult$residuals/ec_type
+qqnorm(normed_res)
+abline(0,1, col='blue')
