@@ -37,11 +37,11 @@ test = USArrests[-indtrain,]
 reg_mult = lm(Murder ~ ., data = train)
 summary(reg_mult)
 
-ggplot(, aes(USArrests$Murder3, reg_mult$fitted.values)) + geom_point() + geom_abline(intercept=0,slope=1, col='green')
+ggplot(data = train, aes(train$Murder, reg_mult$fitted.values)) + geom_point() + geom_abline(intercept=0,slope=1, col='green')
 
 predict(reg_mult, test)
 
 ec_type = summary(reg_mult)$sigma
 normed_res = reg_mult$residuals/ec_type
-qqnorm(normed_res)
-abline(0,1, col='blue')
+qqnorm(residuals(reg_mult))
+qqline(residuals(reg_mult), col=2)
